@@ -88,16 +88,14 @@ void lcd_display()
 	LCD_move_cursor_to_col_row(1, 2);
 	LCD_print_hex8(line);
 
-	// display menu of "acquire line" for left button.
+	// display left sensor data.
 	LCD_move_cursor_to_col_row(0, 1);
-	LCD_print_String("AL");
-
-	// display menu of "PID" for middle button.
-	LCD_move_cursor_to_col_row(3, 1);
-	LCD_print_String("PID");
-
-	// display menu of "Calibration" for right button.
-	LCD_move_cursor_to_col_row(7, 1);
-	LCD_print_String("C");	
+	LCD_print_hex16(g_sensors[0]);
+	
+	// display right sensor data.
+	LCD_move_cursor_to_col_row(4, 1);
+	LCD_print_hex16(g_sensors[4]);
+	
+	
 }
 

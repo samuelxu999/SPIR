@@ -10,7 +10,6 @@ LIB_DRIVER = $(patsubst %.c,${DIR_LIB}/%.o,$(notdir ${SRC_DRIVER}))
 
 
 LIB_LINK = ${DIR_LIB}/pushbutton_driver.o \
-	${DIR_LIB}/motor_driver.o \
 	${DIR_LIB}/lcd_driver.o \
 	${DIR_LIB}/ADC_driver.o \
 	${DIR_LIB}/menu_driver.o
