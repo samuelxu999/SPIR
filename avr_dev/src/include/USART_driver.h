@@ -1,9 +1,9 @@
 /*
 ************************* USART_driver.h **************************
-     Author: Xu Ronghua
-       mail: rxu22@binghamton.edu
-Create date: 2017-04-27
-   Function: Interface definition for USART driver
+	Author: Xu Ronghua
+	mail: rxu22@binghamton.edu
+	Create date: 2017-04-27
+	Function: Interface definition for USART driver
 */
 
 #ifndef USART_DRIVER_H

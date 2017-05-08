@@ -4,7 +4,7 @@
 	 mail: rxu22@binghamton.edu
 	 Create date: 2017-4 -29
 	 Function: Interface implementation for SPI driver
-****************************************************************************/
+*/
 
 #include "SPI_driver.h"
 

@@ -4,7 +4,7 @@
 	mail: rxu22@binghamton.edu
 	Create date: 2017-04-27
 	Function: Implementation for USART driver
-****************************************************************************/
+*/
 
 
 #include "USART_driver.h"

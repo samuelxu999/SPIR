@@ -28,7 +28,6 @@ void Sensor_Init(){
 	Example usage:	Sensor_SingleRead(ch_num)
 	Input:
 		@ch_id:		selected channel id
-
 	Output:
 		@sensor_data:	return sensor data as unsigned int
 */

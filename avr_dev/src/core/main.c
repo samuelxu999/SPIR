@@ -49,26 +49,30 @@ int main(void)
 		}
 		_delay_ms(1000);
 		continue;*/
-		//Stop monitor as receiving cmd=0x00;
-		if(0x00==cmd_data){
-			_delay_ms(10);
-			continue;
-		}
 
-		/*************Sensor Test: used foreach sensor data in array ******************/
-		unsigned int sensor_data;
+		//Start single monitor as receiving cmd=0x01;
+		if(0x00!=cmd_data){
+			//_delay_ms(10);
+			//continue;
+			/*************Sensor Test: used foreach sensor data in array ******************/
+			unsigned int sensor_data;
 
-		for(int i=0;i<8;i++){
+			//for(int i=0;i<8;i++){
 			/********* Read sensor data  ****************/
+			if(cmd_data>8)
+				continue;
+			int i=cmd_data;
 			sensor_data=Sensor_SingleRead(i);
-			
+		
 			/********* Send sensor data to PC vie RS232 ****************/
 			USART0_Transmit(i);
 			USART0_Transmit((sensor_data>>8)&0xff);
 			USART0_Transmit(sensor_data&0xff);
-			_delay_ms(200);
+			_delay_ms(10);
+			//}
+			//clear cmd_data
+			cmd_data=0x00;
 		}
-		_delay_ms(1000);
 	}
 	return 0;
 }

@@ -4,7 +4,7 @@
 	mail: rxu22@binghamton.edu
 	Create date: 2017-4 -25
 	Function: Implementation of ADC Sensor driver
-**************************************************************************/
+*/
 
 #include "ADC_driver.h"
 
@@ -39,7 +39,7 @@ void ADC_Init(){
 		-----------------------------------------------------
 	*/
 	// set ADMUX: 1)Ref is Vcc; 2)ADLAR=0 ADC right Adjust Result 	 	
-    ADMUX=(1<<REFS0); 	
+    ADMUX=(1<<REFS0); 
 }
 
 /************** Read ADC value from channel ADC0 on chip **********************
