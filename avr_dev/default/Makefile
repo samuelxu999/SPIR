@@ -15,7 +15,7 @@ COMMON = -mmcu=$(MCU)
 
 ## Compile options common for all C compilation units.
 CFLAGS = $(COMMON)
-CFLAGS += -Wall -gdwarf-2 -std=gnu99                                                                                                                       -DF_CPU=8000000UL -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
+CFLAGS += -Wall -gdwarf-2 -std=gnu99                                                                                                                                     -DF_CPU=8000000UL -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CFLAGS += -MD -MP -MT $(*F).o -MF dep/$(@F).d 
 
 ## Assembly specific flags
@@ -37,7 +37,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 
 ## Include Directories
-INCLUDES = -I"F:\GitHub\SPIR\avr_dev\src\include" 
+INCLUDES = -I"D:\Github\SPIR\avr_dev\src\include" 
 
 ## Objects that must be built in order to link
 OBJECTS = main.o ADC_driver.o USART_driver.o SPI_driver.o Sensor.o 
@@ -46,9 +46,7 @@ OBJECTS = main.o ADC_driver.o USART_driver.o SPI_driver.o Sensor.o
 LINKONLYOBJECTS = 
 
 ## Build
-all: $(TARGET) avr_dev.hex avr_dev.eep avr_dev.lss size
-
-## Compile
+all: $(TARGET) avr_dev.hex avr_dev.eep avr_dev.lss## Compile
 main.o: ../src/core/main.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
@@ -76,10 +74,6 @@ $(TARGET): $(OBJECTS)
 
 %.lss: $(TARGET)
 	avr-objdump -h -S $< > $@
-
-size: ${TARGET}
-	@echo
-	@avr-size -C --mcu=${MCU} ${TARGET}
 
 ## Clean target
 .PHONY: clean

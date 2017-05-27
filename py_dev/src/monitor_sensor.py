@@ -14,13 +14,38 @@ import RS232_module as MyData
 import plot_animation as MyPlot
 import time
 import datetime
+import configparser
 
 '''
 ======================= global variable =======================
 '''
 logfile=""
 log_en=0
+MAX_SENSOR=10
 
+'''
+Function: Load configuration setting from config.txt file.   
+@arguments: 
+(out)  config_data         return parsed config data
+'''  
+def Load_Config():
+    #new a RawConfigParser Objects
+    myconfig = configparser.RawConfigParser()   
+    
+    #read data from config file
+    configFilePath = r'Config.txt'
+    myconfig.read(configFilePath)
+    
+    #get scantime duration and sensoring interval time.
+    myscantime = myconfig.get('Sensor-config', 'SCANTIME')
+    mysinterval = myconfig.get('Sensor-config', 'INTERVAL')
+    
+    config_data={}
+    config_data['scantime']=myscantime
+    config_data['interval']=mysinterval
+    
+    #return parsed config data
+    return config_data
 
 '''
 Function: Save ls_record[] data as report:filename under current directory
@@ -73,6 +98,10 @@ def monitor_online(sendor_id):
         print("serial port not open successful, please check port status.")
         exit()
     
+    #get config data by user
+    myconfigdata=Load_Config()
+    scantime= int(myconfigdata['scantime'])
+    interval=float(myconfigdata['interval'])
     
     #set log file
     str_time=str(datetime.datetime.now())
@@ -90,7 +119,7 @@ def monitor_online(sendor_id):
     #monitor sensor through endless loop
     monitorNum=0
     # we set monitor cycletime is 60s
-    while(monitorNum<60):
+    while(monitorNum<scantime):
         #data sensoring rate second
         #time.sleep(0.5)
         #read sensor data
@@ -112,11 +141,10 @@ def monitor_online(sendor_id):
         MyPlot.update_line(monitorNum,ls_record[sendor_id])
         
         #plot refresh rate second
-        MyPlot.plt.pause(0.1)
+        MyPlot.plt.pause(interval)
         
         #add monitor counter
         monitorNum=monitorNum+1
-
         
     #close RS232 port
     print("Close serial port %s"  %(myserial.port))
@@ -194,29 +222,29 @@ Function: Provide command line interface for user
 '''        
 if __name__ == "__main__":
     if(len(sys.argv)<2):
-        print("Usage: %s --online|offline sensor_id(1~8) --log(Optional)" %(sys.argv[0]))
+        print("Usage: %s --online|offline sensor_id(1~%s) --log(Optional)" %(sys.argv[0],MAX_SENSOR))
         exit()
     
     if(sys.argv[1]=="--online"):
         if(len(sys.argv)<3):
-           print("1) Usage: %s --online sensor_id(1~8) --log(Optional)" %(sys.argv[0]))
+           print("1) Usage: %s --online sensor_id(1~%s) --log(Optional)" %(sys.argv[0],MAX_SENSOR))
            exit()
         if((len(sys.argv)==4) and sys.argv[3]=="--log"):
             log_en=1
         sendor_id=int(sys.argv[2])
-        if(not (sendor_id<=8 and sendor_id>=1)):
-            print("Invalid sensor id, should be range from 1 to 8")
+        if(not (sendor_id<=MAX_SENSOR and sendor_id>=1)):
+            print("Invalid sensor id, should be range from 1 to %s" %(MAX_SENSOR))
             exit()
         #call online mode
         monitor_online(sendor_id)
     elif(sys.argv[1]=="--offline"):
         if(len(sys.argv)<4):
-           print("2) Usage: %s --offline sensor_id(1~8) logname" %(sys.argv[0]))
+           print("2) Usage: %s --offline sensor_id(1~%s) logname" %(sys.argv[0],MAX_SENSOR))
            exit()
         sendor_id=int(sys.argv[2])
         logname=sys.argv[3]
-        if(not (sendor_id<=8 and sendor_id>=1)):
-            print("Invalid sensor id, should be range from 1 to 8")
+        if(not (sendor_id<=MAX_SENSOR and sendor_id>=1)):
+            print("Invalid sensor id, should be range from 1 to %s" %(MAX_SENSOR))
             exit()
         #call offline mode        
         monitor_offline(logname,sendor_id)

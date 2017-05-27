@@ -11,17 +11,46 @@ Created on May 6, 2017
 import serial
 import time
 import array
+import configparser
 
+MAX_SENSOR=10
+
+'''
+Function: Load configuration setting from config.txt file.   
+@arguments: 
+(out)  config_data         return parsed config data
+'''  
+def Load_Config():
+    #new a RawConfigParser Objects
+    myconfig = configparser.RawConfigParser()   
+    
+    #read data from config file
+    configFilePath = r'Config.txt'
+    myconfig.read(configFilePath)
+    
+    #get port number and baudrate setting.
+    myport = myconfig.get('RS232-config', 'PORT')
+    mybaud=myconfig.get('RS232-config', 'BAUDRATE')
+    
+    config_data={}
+    config_data['port']=myport
+    config_data['baudrate']=mybaud
+    
+    #return parsed config data
+    return config_data
 
 '''
 Function: RS232 initialize to setup default configuration.   
 @arguments: 
-(out)  ser        return initialized serial object
+(out)  ser                return initialized serial object
 '''    
 def RS232_Init():
+    #get config data by user
+    myconfigdata=Load_Config()
+    
     ser = serial.Serial()
-    ser.port = 'COM6'
-    ser.baudrate = 9600
+    ser.port = myconfigdata['port']
+    ser.baudrate = myconfigdata['baudrate']
     ser.parity = serial.PARITY_NONE
     ser.stopbits = serial.STOPBITS_ONE
     ser.bytesize = serial.EIGHTBITS
@@ -32,6 +61,7 @@ def RS232_Init():
     ser.rtscts = False     #disable hardware (RTS/CTS) flow control
     ser.dsrdtr = False       #disable hardware (DSR/DTR) flow control
     ser.writeTimeout = 2     #timeout for write
+    
     return ser
 
 
@@ -84,7 +114,7 @@ Function: read sensor from RS232 channel and return formatted data.
 '''   
 def Read_Sensor(obj_serial):       
     ls_data=[]
-    #read sensor data for 8 channel
+    #read sensor data for all channel
     sensor_id=1
     while True:
         
@@ -97,19 +127,19 @@ def Read_Sensor(obj_serial):
         #myserial.write(b'\x01')          
         obj_serial.write(array.array('B',[sensor_id]).tostring())             
         
-        #wait for 100ms to read buffered data
-        time.sleep(0.1)
+        #wait for 25ms to read buffered data
+        time.sleep(0.025)
         #sensor_data=0x00
         while obj_serial.inWaiting() > 0:
             ls_data.append(obj_serial.read(3).hex())
         
         #switch monitor channel of sensor
         sensor_id = sensor_id + 1
-        if (sensor_id > 8):
+        if (sensor_id > MAX_SENSOR):
             break
         
     #return data list
     return ls_data
        
 #if __name__ == "__main__":
-#    testfun()
+#    RS232_Init()

@@ -1,0 +1,7 @@
+[RS232-config]
+PORT = COM6
+BAUDRATE = 9600
+
+[Sensor-config]
+SCANTIME = 120
+INTERVAL = 0.25

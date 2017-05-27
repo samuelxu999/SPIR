@@ -28,7 +28,7 @@ Function: initialize plot default configuration.
 def init(sensor_id):
     
     #labels
-    plt.xlabel("Time slot (Sec)")
+    plt.xlabel("Time slot")
     plt.ylabel("Sensor-%s data" %(sensor_id))
     #graph original size
     ax.set_ylim(0, 1200)
@@ -95,7 +95,7 @@ def plot_offline(ls_records, sensor_id):
     #plt.figure(42)
     
     #labels
-    plt.xlabel("Time slot (Sec)")
+    plt.xlabel("Time slot")
     plt.ylabel("Sensor-%s data" %(sensor_id))
     
     #plot data

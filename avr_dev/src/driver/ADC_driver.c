@@ -38,8 +38,9 @@ void ADC_Init(){
 		| REFS1 | REFS0 | ADLAR | MUX4 | MUX3 | MUX2 | MUX1 | MUX0 |
 		-----------------------------------------------------
 	*/
-	// set ADMUX: 1)Ref is Vcc; 2)ADLAR=0 ADC right Adjust Result 	 	
-    ADMUX=(1<<REFS0); 
+	// set ADMUX: 1)Ref is internal 2.56V; 2)ADLAR=0 ADC right Adjust Result 	 	
+    //ADMUX=(1<<REFS1|1<<REFS0);
+	ADMUX=(1<<REFS0); 
 }
 
 /************** Read ADC value from channel ADC0 on chip **********************
