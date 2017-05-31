@@ -87,7 +87,7 @@ Function: Monitor sensor data in online mode:
         2) plot line chart to visualize monitor data
         3) if enable '--log' option, sensor data will be saved as '@Date-@Time.log'
 '''
-def monitor_online(sendor_id):
+def monitor_online(sensor_id):
     #initialize RS232 object-myserial
     myserial=MyData.RS232_Init()
     print("Application will use port: %s" %(myserial.port))
@@ -113,8 +113,21 @@ def monitor_online(sendor_id):
     #logfile=datetime.datetime.strptime(str(datetime.datetime.now()), "%H:%M:%S")
     #print(logfile)
     
+    #define to set multi-plot mode
+    isMultiPlot=False
+    #input value type valid, then operate based on parameter type: number or non-number
+    if(sensor_id.isdigit()):
+        sensor_id=int(sensor_id)
+        if(not (sensor_id<=MAX_SENSOR and sensor_id>=1)):
+            print("Invalid sensor id, should be range from 1 to %s" %(MAX_SENSOR))
+            exit()
+    else:
+        if(sensor_id!='--'):
+            print("Invalid sensor id, should be number, or use -- to display all channels data!")
+            exit()
+        isMultiPlot=True
     #plot_line()
-    MyPlot.plot_online(sendor_id)
+    MyPlot.plot_online(sensor_id,isMultiPlot,MAX_SENSOR)
     
     #monitor sensor through endless loop
     monitorNum=0
@@ -138,7 +151,8 @@ def monitor_online(sendor_id):
             ExportData(ls_record,logfile)
         
         #update_line(hl,ls_record[0],ls_record[1])
-        MyPlot.update_line(monitorNum,ls_record[sendor_id])
+        #MyPlot.update_line(monitorNum,ls_record[sensor_id])
+        MyPlot.update_line(monitorNum,ls_record,sensor_id,isMultiPlot,MAX_SENSOR)
         
         #plot refresh rate second
         MyPlot.plt.pause(interval)
@@ -215,7 +229,18 @@ def monitor_offline(logname, sensor_id):
     ls_info=Parselines(ls_line)
     #print(ls_info[0])
     
-    MyPlot.plot_offline(ls_info,sensor_id)
+    #input value type valid, then operate based on parameter type: number or non-number
+    if(sys.argv[2].isdigit()):      
+        if(not (int(sensor_id)<=MAX_SENSOR and int(sensor_id)>=1)):
+            print("Invalid sensor id, should be range from 1 to %s" %(MAX_SENSOR))
+            exit()
+        MyPlot.plot_offline(ls_info,int(sensor_id))
+    else:
+        if(sensor_id!='--'):
+            print("Invalid sensor id, should be number, or use -- to display all channels data!")
+            exit() 
+        MyPlot.plot_offlineAll(ls_info,MAX_SENSOR)  
+
 
 '''
 Function: Provide command line interface for user
@@ -231,22 +256,18 @@ if __name__ == "__main__":
            exit()
         if((len(sys.argv)==4) and sys.argv[3]=="--log"):
             log_en=1
-        sendor_id=int(sys.argv[2])
-        if(not (sendor_id<=MAX_SENSOR and sendor_id>=1)):
-            print("Invalid sensor id, should be range from 1 to %s" %(MAX_SENSOR))
-            exit()
+        sensor_id=sys.argv[2]
         #call online mode
-        monitor_online(sendor_id)
+        monitor_online(sensor_id)
+    
     elif(sys.argv[1]=="--offline"):
         if(len(sys.argv)<4):
            print("2) Usage: %s --offline sensor_id(1~%s) logname" %(sys.argv[0],MAX_SENSOR))
            exit()
-        sendor_id=int(sys.argv[2])
+        sensor_id=sys.argv[2]
         logname=sys.argv[3]
-        if(not (sendor_id<=MAX_SENSOR and sendor_id>=1)):
-            print("Invalid sensor id, should be range from 1 to %s" %(MAX_SENSOR))
-            exit()
+
         #call offline mode        
-        monitor_offline(logname,sendor_id)
+        monitor_offline(logname,sensor_id)
     else:
         print("Usage: %s --online|offline --log(Optional)" %(sys.argv[0]))    
