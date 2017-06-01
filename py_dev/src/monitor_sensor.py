@@ -194,7 +194,7 @@ def Parselines(ls_line):
     #remove title from ls_line
     del ls_line[0]
     
-    # 1.split each line racord into ls_info[]
+    # 1.split each line record into ls_info[]
     for tmp_line in ls_line:
         ls_data=[]
         

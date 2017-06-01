@@ -4,4 +4,4 @@ BAUDRATE = 9600
 
 [Sensor-config]
 SCANTIME = 600
-INTERVAL = 0.25
+INTERVAL = 0.01

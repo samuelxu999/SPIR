@@ -26,9 +26,9 @@ ls_xdata, ls_ydata = [], []
 
 SUB_PLOT_ROW="4"
 SUB_PLOT_COLUMN="2"
-INCREAMENT_X=10
+INCREAMENT_X=60
 INIT_XLIM=1200
-INIT_YLIM=10
+INIT_YLIM=60
 
 '''
 Function: initialize single plot default configuration.   
@@ -163,8 +163,7 @@ def update_multiline(data_x,ls_data,max_channel):
     sensor_id=0
     #used for counting sub-plot id
     plot_id=0
-    print(len(ls_xdata))
-    print(len(ls_ydata))
+
     # update the data
     t = data_x
     while(sensor_id<max_channel):   
