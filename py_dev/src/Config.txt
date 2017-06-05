@@ -1,7 +1,9 @@
 [RS232-config]
-PORT = COM6
-BAUDRATE = 9600
+port = COM6
+baudrate = 9600
 
 [Sensor-config]
-SCANTIME = 600
-INTERVAL = 0.01
+scantime = 60
+interval = 0.01
+disp_chan = [1, 1, 1, 1, 1, 1, 0, 1, 1, 0]
+

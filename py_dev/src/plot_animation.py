@@ -8,8 +8,9 @@ Created on May 6, 2017
 @TaskDescription: This module will plot animation for sensor data.
 """
 
-import matplotlib.pyplot as plt
 import time
+import matplotlib.pyplot as plt
+import Utility as MyUtility
 
 '''
 ======================= global variable =======================
@@ -24,11 +25,67 @@ lines=[]
 ls_xdata, ls_ydata = [], []
 #xdata, ydata = [], []
 
-SUB_PLOT_ROW="4"
-SUB_PLOT_COLUMN="2"
+ls_dispchan=[]
+
+#SUB_PLOT_ROW="4"
+#SUB_PLOT_COLUMN="2"
 INCREAMENT_X=60
-INIT_XLIM=1200
-INIT_YLIM=60
+INCREAMENT_Y=10
+INIT_YLIM=1024
+INIT_XLIM=60
+
+'''
+Function: Load configuration setting from config.txt file.   
+@arguments: 
+(out)  config_data         return parsed config data
+'''  
+def Load_Config():
+    #initialize UserConfig()
+    userconfig = MyUtility.UserConfig()
+    config_data={}
+    
+    config_data={}
+    config_data['dispchan']=str(userconfig.getDispchan()).replace(" ","")
+    
+    #return parsed config data
+    return config_data
+
+'''
+Function: initialize multi-plot grid layout.   
+@arguments: 
+(out)  SUB_PLOT_ROW            return plot grid row count
+(out)  SUB_PLOT_COLUMN         return plot grid column count 
+'''
+def Init_PlotGrid():
+    #get config data by user
+    myconfigdata=Load_Config()
+    max_plot=0
+    
+    #clear ls_dispchan[]
+    del ls_dispchan[:]
+    #for each data in list to check channel enable flag
+    for i in myconfigdata['dispchan'][1:-1].split(','):
+        ls_dispchan.append(int(i))
+        if(i=='1'):
+            max_plot+=1
+    
+    #initialize sub-plot grid
+    if(max_plot==1):
+        SUB_PLOT_ROW="1"
+        SUB_PLOT_COLUMN="1"
+    elif(max_plot<=2):
+        SUB_PLOT_ROW="2"
+        SUB_PLOT_COLUMN="1"
+    elif(max_plot<=4):
+        SUB_PLOT_ROW="2"
+        SUB_PLOT_COLUMN="2"
+    elif(max_plot<=6):
+        SUB_PLOT_ROW="3"
+        SUB_PLOT_COLUMN="2"
+    else:
+        SUB_PLOT_ROW="4"
+        SUB_PLOT_COLUMN="2"
+    return SUB_PLOT_ROW,SUB_PLOT_COLUMN,max_plot
 
 '''
 Function: initialize single plot default configuration.   
@@ -45,13 +102,12 @@ def init_singleplot(sensor_id):
     plt.xlabel("Time slot")
     plt.ylabel("Sensor-%s data" %(sensor_id))
     #graph original size
-    ax.set_ylim(0, INIT_XLIM)
-    ax.set_xlim(0, INIT_YLIM)
+    #ax.set_ylim(0, INIT_YLIM)
+    #ax.set_xlim(0, INIT_XLIM)
     
     #graph original size
     xdata, ydata = [], []
-    del ls_xdata[:]
-    del ls_ydata[:]
+
     line.set_data(xdata, ydata)
     
     #add local xdata, ydata to global list ls_xdata,ls_ydata 
@@ -69,26 +125,26 @@ Function: initialize multi-plot default configuration.
 (in)  max_channel            input max channels limitation
 '''
 def init_multiplot(max_channel):
+    SUB_PLOT_ROW,SUB_PLOT_COLUMN,max_plot=Init_PlotGrid()
+    
     #used for counting sensor id
     sensor_id=0
     #used for counting sub-plot id
     plot_id=0
-    
-    #clear ls_xdata and ls_ydata
-    del ls_xdata[:]
-    del ls_ydata[:]
         
     while(sensor_id<max_channel):   
         #count sensor_id
         sensor_id+=1
         
-        #Skip channel 6 and 9 on circuit board
-        if(sensor_id==7 or sensor_id==10):
+        #Skip disabled channel on circuit board
+        if(ls_dispchan[sensor_id-1]==0):
             continue
     
         #calculate sub-plot id
         plot_id+=1
-        #plotnum=420+plot_id
+        if(plot_id>(int(SUB_PLOT_ROW)*int(SUB_PLOT_COLUMN))):
+            break
+        #set sub plot layout
         plotnum=SUB_PLOT_ROW+SUB_PLOT_COLUMN+str(plot_id)
         
         #new axis object and add to subplot
@@ -98,11 +154,11 @@ def init_multiplot(max_channel):
         line, = ax.plot([], [], lw=1)
         
         #labels
-        plt.xlabel("Time slot")
+        plt.xlabel("Scan Number")
         plt.ylabel("Sensor-%s data" %(sensor_id))
         #graph original size
-        ax.set_ylim(0, INIT_XLIM)
-        ax.set_xlim(0, INIT_YLIM)
+        ax.set_ylim(0, INIT_YLIM)
+        ax.set_xlim(0, INIT_XLIM)
         
         #graph original size
         xdata, ydata = [], []
@@ -137,16 +193,30 @@ Function: update line object based on inputed parameter
 '''
 def update_singleline(data_x,data_y):
     # update the data
-    t = data_x
-    y = data_y
+    t = int(data_x)
+    y = int(data_y)
     ls_xdata[0].append(t)
     ls_ydata[0].append(y)
     xmin, xmax = ls_ax[0].get_xlim()
+    ymin, ymax = ls_ax[0].get_ylim()
     
-    #rearrange x-boundary
-    if t >= xmax:
-        ls_ax[0].set_xlim(xmin, xmax+INCREAMENT_X)
+    #auto expend display boundary based on real value
+    if(t==0):
+        #initialize y-boundary
+        ls_ax[0].set_ylim(y-INCREAMENT_Y, y+INCREAMENT_Y)
         ls_ax[0].figure.canvas.draw()
+    else:    
+        #rearrange x-boundary
+        if t >= xmax:
+            ls_ax[0].set_xlim(xmin, xmax+INCREAMENT_X)
+            ls_ax[0].figure.canvas.draw()
+        #rearrange y-boundary
+        if y >= ymax:
+            ls_ax[0].set_ylim(ymin, y+INCREAMENT_Y)
+            ls_ax[0].figure.canvas.draw()
+        if y <= ymin:
+            ls_ax[0].set_ylim(y-INCREAMENT_Y, ymax)
+            ls_ax[0].figure.canvas.draw()
     
     # update line by set updated data list
     lines[0].set_data(ls_xdata[0], ls_ydata[0])
@@ -159,6 +229,8 @@ Function: update multiple line objects based on inputed parameter
 (in)  max_channel        input max channels limitation
 '''
 def update_multiline(data_x,ls_data,max_channel):
+    SUB_PLOT_ROW,SUB_PLOT_COLUMN,max_plot=Init_PlotGrid()
+    
     #used for counting sensor id
     sensor_id=0
     #used for counting sub-plot id
@@ -170,11 +242,14 @@ def update_multiline(data_x,ls_data,max_channel):
         #count sensor_id
         sensor_id+=1
         
-        #Skip channel 6 and 9 on circuit board
-        if(sensor_id==7 or sensor_id==10):
-            continue
+        
+        #Skip disabled channel on circuit board
+        if(ls_dispchan[sensor_id-1]==0):
+             continue
         
         plot_id+=1
+        if(plot_id>(int(SUB_PLOT_ROW)*int(SUB_PLOT_COLUMN))):
+            break
         
         y = ls_data[sensor_id]
         ls_xdata[plot_id-1].append(t)
@@ -194,6 +269,13 @@ Function: initialize plot_animation related default setting.
 @arguments: 
 '''
 def plot_online(sensor_id,multiplot_flag,max_channel):
+    
+    #clear global list
+    del ls_ax[:]
+    del lines[:]
+    del ls_xdata[:]
+    del ls_ydata[:]
+    
     #Set up plot default setting 
     if(multiplot_flag):
         init_multiplot(max_channel)
@@ -227,11 +309,12 @@ def plot_offline(ls_records, sensor_id):
     #plt.figure(42)
     
     #labels
-    plt.xlabel("Time slot")
+    plt.xlabel("Scan Number")
     plt.ylabel("Sensor-%s data" %(sensor_id))
     
     #plot data
-    plt.plot(timeslot, SensorData)
+    plt.plot(timeslot, SensorData, lw=1.0)
+    plt.grid()
     
     #show plot
     plt.show()
@@ -243,6 +326,9 @@ Function: run on offline mode, plot all channel data on one chart.
 (in)    max_channel:            limit max channels
 '''
 def plot_offlineAll(ls_records, max_channel):
+    #initialize plot grid
+    SUB_PLOT_ROW,SUB_PLOT_COLUMN,max_plot=Init_PlotGrid()
+    
     #used for counting sensor id
     sensor_id=0
     #used for counting sub-plot id
@@ -256,9 +342,9 @@ def plot_offlineAll(ls_records, max_channel):
         #count sensor_id
         sensor_id+=1
         
-        #Skip channel 6 and 9 on circuit board
-        if(sensor_id==7 or sensor_id==10):
-            continue
+        #Skip disabled channel on circuit board
+        if(ls_dispchan[sensor_id-1]==0):
+             continue
             
         #prepare data for sub-plot
         i=1
@@ -269,16 +355,20 @@ def plot_offlineAll(ls_records, max_channel):
         
         #calculate sub-plot id
         plot_id+=1
-        #plotnum=420+plot_id
+        if(plot_id>(int(SUB_PLOT_ROW)*int(SUB_PLOT_COLUMN))):
+            break
+        
+        #set sub plot layout
         plotnum=SUB_PLOT_ROW+SUB_PLOT_COLUMN+str(plot_id)
         
         #-------subplot for each sensor data-------    
         plt.subplot(int(plotnum))
         #labels
-        plt.xlabel("Time slot")
+        plt.xlabel("Scan Number")
         plt.ylabel("Sensor-%s data" %(sensor_id))    
         #plot data
-        plt.plot(timeslot, SensorData)
+        plt.plot(timeslot, SensorData, lw=1.0)
+        plt.grid()
     #show plot
     plt.show()
     

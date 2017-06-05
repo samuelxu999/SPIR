@@ -11,7 +11,7 @@ Created on May 6, 2017
 import serial
 import time
 import array
-import configparser
+import Utility as MyUtility
 
 MAX_SENSOR=10
 
@@ -20,21 +20,14 @@ Function: Load configuration setting from config.txt file.
 @arguments: 
 (out)  config_data         return parsed config data
 '''  
-def Load_Config():
-    #new a RawConfigParser Objects
-    myconfig = configparser.RawConfigParser()   
-    
-    #read data from config file
-    configFilePath = r'Config.txt'
-    myconfig.read(configFilePath)
-    
-    #get port number and baudrate setting.
-    myport = myconfig.get('RS232-config', 'PORT')
-    mybaud=myconfig.get('RS232-config', 'BAUDRATE')
+def Load_Config():    
+    #initialize UserConfig()
+    userconfig = MyUtility.UserConfig()
+    config_data={}
     
     config_data={}
-    config_data['port']=myport
-    config_data['baudrate']=mybaud
+    config_data['port']=userconfig.getPort()
+    config_data['baudrate']=userconfig.getBaudrate()
     
     #return parsed config data
     return config_data
@@ -64,6 +57,17 @@ def RS232_Init():
     
     return ser
 
+'''
+Function: check whether port is available.   
+@arguments: 
+(in)  portName        input port name for check
+''' 
+def portIsUsable(portName):
+    try:
+       ser = serial.Serial(port=portName)
+       return True
+    except:
+       return False
 
 '''
 Function: open RS232 port to set up communication.   

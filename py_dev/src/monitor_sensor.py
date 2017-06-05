@@ -10,11 +10,12 @@ Created on May 6, 2017
 
 import sys
 import os
-import RS232_module as MyData
-import plot_animation as MyPlot
 import time
 import datetime
-import configparser
+import RS232_module as MyData
+import plot_animation as MyPlot
+import Utility as MyUtility
+
 
 '''
 ======================= global variable =======================
@@ -29,20 +30,11 @@ Function: Load configuration setting from config.txt file.
 (out)  config_data         return parsed config data
 '''  
 def Load_Config():
-    #new a RawConfigParser Objects
-    myconfig = configparser.RawConfigParser()   
-    
-    #read data from config file
-    configFilePath = r'Config.txt'
-    myconfig.read(configFilePath)
-    
-    #get scantime duration and sensoring interval time.
-    myscantime = myconfig.get('Sensor-config', 'SCANTIME')
-    mysinterval = myconfig.get('Sensor-config', 'INTERVAL')
-    
+    #initialize UserConfig()
+    userconfig = MyUtility.UserConfig()
     config_data={}
-    config_data['scantime']=myscantime
-    config_data['interval']=mysinterval
+    config_data['scantime']=userconfig.getScantime()
+    config_data['interval']=userconfig.getInterval()
     
     #return parsed config data
     return config_data
@@ -90,6 +82,10 @@ Function: Monitor sensor data in online mode:
 def monitor_online(sensor_id):
     #initialize RS232 object-myserial
     myserial=MyData.RS232_Init()
+    if(not MyData.portIsUsable(myserial.port)):
+        print("Port: %s is not available!" %(myserial.port))
+        exit()
+        
     print("Application will use port: %s" %(myserial.port))
     
     #Open RS232 port
@@ -131,7 +127,7 @@ def monitor_online(sensor_id):
     
     #monitor sensor through endless loop
     monitorNum=0
-    # we set monitor cycletime is 60s
+    # we set monitor scan number is scantime
     while(monitorNum<scantime):
         #data sensoring rate second
         #time.sleep(0.5)
@@ -165,7 +161,7 @@ def monitor_online(sensor_id):
     MyData.RS232_Close(myserial)
     if(myserial.isOpen()):
         print("serial port close error!") 
-
+        
 '''
 Function:read line contents from file
 @arguments: 
@@ -241,6 +237,20 @@ def monitor_offline(logname, sensor_id):
             exit() 
         MyPlot.plot_offlineAll(ls_info,MAX_SENSOR)  
 
+'''
+Function: Monitor sensor data in offline mode by UI:
+        1) read sensor data log
+        2) plot line chart to visualize monitor data
+'''
+def monitor_offlineUI(logname):
+    #read log file and save data as ls_line[]
+    ls_line=ReadLines(logname)    
+    
+    #handle line list data and save result as ls_info    
+    ls_info=Parselines(ls_line)
+    
+    #call plot function
+    MyPlot.plot_offlineAll(ls_info,MAX_SENSOR)
 
 '''
 Function: Provide command line interface for user
