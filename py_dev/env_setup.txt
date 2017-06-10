@@ -10,7 +10,7 @@ This document introduce how to set up python development environment for our pro
 	3)Install PyQT5 lib:	http://pyqt.sourceforge.net/Docs/PyQt5/installation.html
 			python -m pip install pyqt5
 
---- Ubuntu: Default python environment shoould be available on your Ubuntu-16.04, they are python2.7 or python3. Otherwize, install python by manual.
+--- Ubuntu: Default python environment shoould be available on your Ubuntu-16.04, they are python2.7 or python3.5; Otherwize, install python by manual.
 	1)Install pip:		https://packaging.python.org/install_requirements_linux/
 		sudo apt-get install python-pip			#python2.7
 		sudo apt-get install python3-pip		#python3.5
@@ -21,7 +21,7 @@ This document introduce how to set up python development environment for our pro
 
 	3)Install matplotlib:	https://matplotlib.org/users/installing.html
 		sudo python -m pip install matplotlib		#python2.7
-		sudo python -m pip install matplotlib		#python3.5
+		sudo python3.5 -m pip install matplotlib	#python3.5
 
 	4)Install PyQT5 lib:	http://pyqt.sourceforge.net/Docs/PyQt5/installation.html
 		sudo apt-get install python-pyqt5		#python2.7
