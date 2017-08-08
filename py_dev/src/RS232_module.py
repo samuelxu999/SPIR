@@ -119,7 +119,7 @@ Function: read sensor from RS232 channel and return formatted data.
 def Read_Sensor(obj_serial):       
     ls_data=[]
     #read sensor data for all channel
-    sensor_id=1
+    sensor_id=0
     while True:
         
         #flush input buffer, discarding all its contents
@@ -127,23 +127,37 @@ def Read_Sensor(obj_serial):
         #flush output buffer, aborting current output
         obj_serial.flushOutput()
     
-        #write data sensor start command-0x01
-        #myserial.write(b'\x01')          
-        obj_serial.write(array.array('B',[sensor_id]).tostring())             
+        #write REQ command:FF 01 id FF
+        obj_serial.write(b'\xff\x01')        
+        obj_serial.write(array.array('B',[sensor_id]).tostring())
+        obj_serial.write(b'\xff')               
         
         #wait for 25ms to read buffered data
         time.sleep(0.025)
         #sensor_data=0x00
+        
+        req_data=[]
         while obj_serial.inWaiting() > 0:
-            ls_data.append(obj_serial.read(3).hex())
+            #ls_data.append(obj_serial.read(3).hex())
+            req_data.append(obj_serial.read(8).hex())
+        
+        #verify header of packet and extract sensor value
+        if(req_data[0][0:8]=='fe01ffff'):
+            ls_data.append(req_data[0][8:14])
+        else:
+            ls_data.append('ff00000')
+        
+        #ls_data.append(sensor_data)
         
         #switch monitor channel of sensor
         sensor_id = sensor_id + 1
-        if (sensor_id > MAX_SENSOR):
+        if (sensor_id > MAX_SENSOR-1):
             break
         
     #return data list
     return ls_data
        
-#if __name__ == "__main__":
-#    RS232_Init()
+if __name__ == "__main__":
+    myserial=RS232_Init()
+    RS232_Open(myserial) 
+    print(Read_Sensor(myserial))

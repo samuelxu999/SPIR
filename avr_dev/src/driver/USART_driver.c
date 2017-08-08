@@ -21,9 +21,6 @@
 #define USART0_UBRRH	UBRR(0,H)
 
 
-/********* Define Global variable for *******************/
-volatile unsigned char cmd_data = 0x00;
-
 /********* Define USART0 PORT register*******************/
 #define USART_PORT 	PORT(E)
 #define USART_DDR 		DDR(E)
@@ -34,6 +31,15 @@ volatile unsigned char cmd_data = 0x00;
 /********* Define CPU frequency and Baud rate*******************/
 #define F_CPU 			8000000UL
 #define BAUD 			9600
+
+
+/********* Define Global variable for USART function**************/
+#define QBUFF_SIZE 16 				/* Queue size - bytes */
+
+queue_struct rx_USART, tx_USART;	/* rx and rx Queue struct*/
+uByte rx_buff[QBUFF_SIZE]; 			/* rx Queue array buffer*/
+uByte tx_buff[QBUFF_SIZE]; 			/* tx Queue array buffer*/
+
 
 
 /*Calculate ubrr based on Baud:FOSC/16/ui_Baud-1, 
@@ -100,6 +106,10 @@ void USART0_Init(void){
 		UCSZ02=0:		Disable 9 bits data
 	****************************************************************/
 	USART0_UCSRB |= ((1<<RXCIE)|(1<<RXEN0)|(1<<TXEN0));
+
+	/*********** Initialize data receive and transimit Queue **************/
+	qInit(&rx_USART, rx_buff, sizeof(rx_buff));		/* Initialize RX Queue */
+	qInit(&tx_USART, tx_buff, sizeof(tx_buff));		/* Initialize TX Queue */
 }
 
 
@@ -152,6 +162,20 @@ void USART0_putstr(unsigned char *p_data){
 	}
 }
 
+/******** dequeue data from tx_USART buffer and send to USART0 **********************
+	Example usage:	SensorHandler()
+*/
+void USART0_sendbuffer() {
+	/* Then dequeue data until rx_USART empty */
+	while (qStatus(&tx_USART)) 
+	{
+		uByte data;
+		qRead_byte(&tx_USART, &data);
+		USART0_Transmit(data);
+	}
+}
+
+
 /*************************** USART0 receive interrupt handle fucntion **************************
 	Function: 1) handle receive interrupt to read command data from PC.
 			2) Saved received command data to @cmd_data
@@ -165,7 +189,13 @@ ISR(USART0_RX_vect) {
 	if(0x00==cmd_data){
 			//USART0_putstr("Stop monitor!");
 	}*/
-	cmd_data=USART0_Receive();
+	//cmd_data=USART0_Receive();
+
+	uByte data=USART0_Receive();
+	//if rx buffer not full, queue data to rx buffer
+	if(!rx_USART.full) {
+		qWrite_byte(&rx_USART,data);
+	}
 }
 
 

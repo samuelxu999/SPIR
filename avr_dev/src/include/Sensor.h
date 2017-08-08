@@ -2,7 +2,7 @@
 ************************* Sensor.h **************************
 	 Author: Xu Ronghua 
 	 mail: rxu22@binghamton.edu
-	 Create date: 2017-4 -30
+	 Create date: 2017-04-30
 	 Function: Interface definition for Sensor related function
 */
 
@@ -12,6 +12,8 @@
 #include <avr/io.h>
 #include "ADC_driver.h"
 #include "SPI_driver.h"
+#include "USART_driver.h"
+
 
 #define SENSOR_MAX_CHAN	10
 
@@ -31,6 +33,16 @@ void Sensor_Init();
 		@sensor_data:	return sensor data as unsigned int
 */
 unsigned int Sensor_SingleRead(unsigned char sensor_id);
+
+/******** paser command packet from rx_USART buffer and retrun sensor value **********************
+	Example usage:	SensorHandler()
+	Function: 	1) Listen command from rx_USART buffer
+				2) parse command to get operation information
+		  		3) Read sensor data based on pasered sensor id.
+		  		4) Queue data to tx_USART buffer that will be sent by USART0_sendbuffer()
+*/
+void SensorHandler();
+
 
 
 #endif

@@ -15,7 +15,7 @@ COMMON = -mmcu=$(MCU)
 
 ## Compile options common for all C compilation units.
 CFLAGS = $(COMMON)
-CFLAGS += -Wall -gdwarf-2 -std=gnu99                                                                                                                                     -DF_CPU=8000000UL -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
+CFLAGS += -Wall -gdwarf-2 -std=gnu99                                                                                                                                       -DF_CPU=8000000UL -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CFLAGS += -MD -MP -MT $(*F).o -MF dep/$(@F).d 
 
 ## Assembly specific flags
@@ -40,7 +40,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 INCLUDES = -I"D:\Github\SPIR\avr_dev\src\include" 
 
 ## Objects that must be built in order to link
-OBJECTS = main.o ADC_driver.o USART_driver.o SPI_driver.o Sensor.o 
+OBJECTS = main.o ADC_driver.o USART_driver.o SPI_driver.o Sensor.o Queues.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -60,6 +60,9 @@ SPI_driver.o: ../src/driver/SPI_driver.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 Sensor.o: ../src/core/Sensor.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+Queues.o: ../src/core/Queues.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link

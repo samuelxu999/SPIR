@@ -2,7 +2,7 @@
 ************************* ADC_driver.h **************************
 	 Author: Xu Ronghua 
 	 mail: rxu22@binghamton.edu
-	 Create date: 2017-4 -25
+	 Create date: 2017-04-25
 	 Function: Interface definition for ADC Sensor driver
 */
 
@@ -12,10 +12,6 @@
 #include <avr/io.h>
 #include "port_macros.h"
 #include <util/delay.h>
-
-
-#define ADC_MAX_CHAN 			8
-#define ADC_CALIBRATED_SCALE		1000
 
 
 /***************** Initialize the global value and setting. **************************

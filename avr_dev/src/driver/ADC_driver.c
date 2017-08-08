@@ -2,14 +2,14 @@
 ****************************** ADC_driver.c *********************************
 	Author: Xu Ronghua 
 	mail: rxu22@binghamton.edu
-	Create date: 2017-4 -25
+	Create date: 2017-04-25
 	Function: Implementation of ADC Sensor driver
 */
 
 #include "ADC_driver.h"
 
 /**************** Define ADC related PORT register **********************/
-#define ANALOG_DDR				DDR(F)
+#define ANALOG_DDR			DDR(F)
 #define ANALOG_PORT			PORT(F)
 #define ANALOG_PING			PORT(F)
 

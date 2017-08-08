@@ -14,10 +14,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "port_macros.h"
+#include "Queues.h"
 
 
 /********* Declear extern  global variable to provide command data*******************/
-extern volatile unsigned char cmd_data;
+extern queue_struct rx_USART, tx_USART; 	/* Transmit and receive queue structures */
+
 
 
 /*********** USART0 initialize funtion to set USART0 ************
@@ -54,5 +56,10 @@ unsigned char USART0_Receive( void );
 */
 void USART0_putstr(unsigned char *p_data);
 
+
+/******** dequeue data from tx_USART buffer and send to USART0 **********************
+	Example usage:	SensorHandler()
+*/
+void USART0_sendbuffer();
 
 #endif

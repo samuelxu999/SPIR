@@ -2,7 +2,7 @@
 ************************* SPI_driver.h **************************
 	 Author: Xu Ronghua 
 	 mail: rxu22@binghamton.edu
-	 Create date: 2017-4 -29
+	 Create date: 2017-04-29
 	 Function: Interface definition for SPI driver
 */
 
